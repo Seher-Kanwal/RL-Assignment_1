@@ -1,13 +1,18 @@
 """
 Builds report/PA1_report.docx and exports it to PDF with Microsoft Word.
 
-    ../rl2026/Scripts/python.exe make_figures.py
+    cd ../pa1_starter/PA1_studentID_surname
+    python report_figures.py                    # figures/report_fig*.png
+    cd ../../report
     ../rl2026/Scripts/python.exe build_report.py
+
+Tables 2 and 4 are filled from results_extra/extra_results.json.
 
 Inline markup in the text below: **bold**, ~italic~ (a single * is literal, as in V*).
 """
 from __future__ import annotations
 
+import json
 import pathlib
 import re
 
@@ -23,9 +28,16 @@ AUTHOR = "Seher Kanwal"
 STUDENT_ID = "Student ID"          # <-- put your student ID here
 
 HERE = pathlib.Path(__file__).resolve().parent
-FIGS = HERE / "figs"
+SUB = HERE.parent / "pa1_starter" / "PA1_studentID_surname"
+FIGS = SUB / "figures"
 DOCX = HERE / "PA1_report.docx"
-PDF = HERE.parent / "pa1_starter" / "PA1_studentID_surname" / "report.pdf"
+PDF = SUB / "report.pdf"
+EXTRA = json.loads((SUB / "results_extra" / "extra_results.json").read_text(encoding="utf-8"))
+
+
+def num(x, d=1):
+    """Number with a typographic minus."""
+    return f"{x:.{d}f}".replace("-", "−")
 
 NAVY = RGBColor(0x1F, 0x38, 0x64)
 MUTED = RGBColor(0x52, 0x51, 0x4E)
@@ -88,7 +100,7 @@ def figure(name, width, caption, container=None):
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     p.paragraph_format.space_after = Pt(1)
     p.paragraph_format.keep_with_next = True
-    p.add_run().add_picture(str(FIGS / name), width=Inches(width))
+    p.add_run().add_picture(str(FIGS / f"report_{name}"), width=Inches(width))
     cap = para(caption, c, align=WD_ALIGN_PARAGRAPH.LEFT, size=CAP_PT, after=6, color=MUTED)
     return cap
 
@@ -185,7 +197,8 @@ para("All graded numbers are those in results.json (spec settings: α = 0.5, ε 
      "400-step cap, seeds 0–4). Items marked **[supp.]** are supplementary: they come from "
      "extra_experiments.py, which reuses agent.epsilon_greedy and the same update rules (a check confirms "
      "it reproduces agent.sarsa / agent.q_learning bit for bit) and uses 20 seeds where stated. "
-     "Reproduction commands, seeds and versions are in README.md.", size=9, color=MUTED)
+     "The report figures are drawn by report_figures.py; reproduction commands, seeds and versions are "
+     "in README.md.", size=9, color=MUTED)
 
 # ------------------------------------------------------------------ 1
 heading("1  Policy iteration vs value iteration")
@@ -213,10 +226,8 @@ para("**Why rounds 1–6 cost 540 sweeps each.** The initial all-~up~ policy dri
      "shrinks only by γ = 0.95, and 0.95ᵏ⁻¹ < 10⁻¹² gives exactly k = 540. Each improvement re-routes only "
      "the 4–7 states next to already-good ones, so some state keeps looping until round 6. From round 7 "
      "every path terminates, and evaluating a deterministic terminating policy is exact after 12 sweeps. "
-     "Note that each evaluation starts from V = 0 (the initialisation convention). Warm-starting from the "
-     "previous round's V would avoid recomputing the −20 of looping states from scratch, so the sweep total "
-     "partly reflects this choice; the round count (9) does not, because each evaluation is run to the same "
-     "fixed point.")
+     "Each evaluation starts from V = 0; warm-starting from the previous V would lower the sweep total but "
+     "not the 9 rounds, since every evaluation reaches the same fixed point.")
 para("**Why VI needs only 12.** The max lets correct values spread outward from G one cell per sweep: the "
      "largest change is exactly 10·0.95ᵏ⁻¹ (10, 9.5, 9.03, …, 5.99). S is the farthest state, 11 steps "
      "away, so after 11 sweeps every value is exact and sweep 12 confirms Δ = 0. PI takes a few large, "
@@ -233,21 +244,48 @@ para("**Q-learning learns the shortest path along the cliff edge; SARSA learns a
 figure("fig2_paths.png", 6.0,
        "**Figure 2.** Greedy path of each seed (0–4), drawn slightly offset. Q-learning's path is identical "
        "on all seeds.")
-para("**Why.** Q-learning's target r + γ·max_a′ Q(s′,a′) assumes greedy behaviour from the next step on, so it "
+para("**Why it leaves the edge.** Q-learning's target r + γ·max_a′ Q(s′,a′) assumes greedy behaviour from the next step on, so it "
      "estimates q*, the value of the optimal policy, whatever exploration is actually performed (Bellman "
      "optimality). SARSA's target r + γ·Q(s′,a′) uses the action the ε-greedy policy actually takes, so it "
      "estimates q_π of the ε-greedy policy itself (Bellman expectation). On row 3 every step has a "
      "0.1 × ¼ = 2.5 % chance of a random ~down~ move: −75 and a restart at S. SARSA's values price that risk "
-     "in; Q-learning's do not.")
-para("Figure 3 shows this directly. Averaged over row 3 (columns 1–8), SARSA's value is −14.6 while "
-     "Q-learning's is −5.35, exactly V*. (Q-learning matches V* on rows 2–3 and at S; only the rarely "
-     "visited rows 0–1 are still optimistic, by up to 2.4, because Q starts at 0.) SARSA values its top "
-     "row (−11.5) above its edge row, so its greedy policy climbs. **highest_row is therefore a direct "
-     "readout of how much each method's objective is affected by its own exploration.**")
+     "in; Q-learning's do not. Figure 3 shows this: averaged over row 3 (columns 1–8), SARSA's value is "
+     "−14.6 while Q-learning's is −5.35, exactly V*. (Q-learning matches V* on rows 2–3 and at S; only the "
+     "rarely visited rows 0–1 are still optimistic, by up to 2.4, because Q starts at 0.)")
 figure("fig3_value_maps.png", 6.6,
        "**Figure 3 [supp.].** Learned values max_a Q̄(s,a) and greedy action argmax_a Q̄(s,a) of the "
        "seed-averaged Q̄ (seeds 0–4). SARSA's values drop sharply next to the cliff; Q-learning's equal V* "
        "along the edge.")
+para("**Why it goes as far as rows 0–1.** The risk explains leaving the edge, but not the full detour. "
+     "SARSA's convergence target, the fixed point q*_ε of its expected update under ε-greedy behaviour "
+     "(solved exactly from the model), keeps only one row of distance at ε = 0.1: its greedy path runs "
+     "along row 2 with return −13 (Table 4). The extra climb to rows 0–1 (−16.6) comes from the constant "
+     "α = 0.5 and the finite budget. On the same 20 seeds, α = 0.1 learns q*_ε's row-2 path on every seed "
+     "(−13.0). With α = 0.5 each update moves Q halfway towards a single sampled target, so values next to "
+     "the cliff stay noisy and are repeatedly knocked down by single fall-driven samples, and the greedy "
+     "policy keeps more distance than the expected risk justifies. **highest_row therefore measures two "
+     "things: the on-policy objective (row 3 → 2) and the step-size noise (row 2 → 0–1).**")
+
+G = EXTRA["G"]
+
+
+def learned(cell):
+    rows = sorted(int(r) for r in cell["highest_row_counts"] if int(r) < 4)
+    span = f"row {rows[0]}" if rows[0] == rows[-1] else f"rows {rows[0]}–{rows[-1]}"
+    fail = cell["final_fail"]
+    return f"{span} · {num(cell['greedy_mean_reached'])}" + (f" · **{fail} fail**" if fail else "")
+
+
+t4 = [["ε", "q*_ε (exact)", "α = 0.5 (spec)", "α = 0.1", "α = 0.5 / (1 + n/50)"]]
+for e in ["0.01", "0.1", "0.2", "0.3"]:
+    fp = G["fixed_point"][e]
+    t4.append([e, f"row {fp['highest_row']} · {num(fp['greedy_return'])}"] +
+              [learned(G["sarsa"][a][e]) for a in ("alpha = 0.5 (spec)", "alpha = 0.1", "alpha = 0.5/(1+n/50)")])
+data_table(t4, [0.45, 1.15, 1.75, 1.6, 1.75],
+           "**Table 4 [supp.].** SARSA's convergence target vs what it learns (20 seeds, 3,000 episodes). "
+           "Each cell: highest row of the greedy path · greedy return (mean over runs that reach G) · number of "
+           "the 20 final greedy policies that never reach G. q*_ε is the exact fixed point under ε-greedy "
+           "behaviour; n is the visit count of (s, a).")
 
 # ------------------------------------------------------------------ 3
 heading("3  The effect of ε")
@@ -261,39 +299,46 @@ figure("fig4_eps_sweep.png", 6.6,
        "**Figure 4 [supp.].** ε sweep, 20 seeds, mean ± 1 std across seeds; (a, b) over the last 500 "
        "training episodes. (c) Share of late-training greedy snapshots that reach G; the labels count "
        "runs whose final greedy policy never reaches G.")
-data_table([["ε", "Training return  S / Q", "Episodes with a fall  S / Q",
-             "SARSA final greedy: reach G · return", "SARSA late snapshots reaching G"],
-            ["0.01", "−16.5 ± 0.9 / **−13.0 ± 0.5**", "0.2 % / 2.3 %", "20/20 · −16.1", "98.6 %"],
-            ["0.05", "**−20.0 ± 3.0** / −21.2 ± 1.3", "2.4 % / 10.7 %", "20/20 · −16.3", "94.6 %"],
-            ["0.1", "**−23.6 ± 2.7** / −31.8 ± 1.5", "4.6 % / 19.8 %", "19/20 · −15.8", "88.0 %"],
-            ["0.2", "**−34.4 ± 2.9** / −56.8 ± 3.1", "10.7 % / 34.6 %", "19/20 · −16.9", "71.8 %"],
-            ["0.3", "**−46.6 ± 3.4** / −85.5 ± 3.4", "18.2 % / 46.5 %", "15/20 · −16.9", "60.6 %"]],
-           [0.45, 1.85, 1.55, 1.75, 1.3],
+C = EXTRA["C"]
+t2 = [["ε", "Training return  S / Q", "Episodes with a fall  S / Q", "SARSA greedy reaches G",
+       "SARSA greedy return: reached / all", "SARSA late snapshots reaching G"]]
+for e in ["0.01", "0.05", "0.1", "0.2", "0.3"]:
+    s, q = C[e]["sarsa"], C[e]["qlearning"]
+    ts = f"{num(s['training_mean'])} ± {s['training_std']:.1f}"
+    tq = f"{num(q['training_mean'])} ± {q['training_std']:.1f}"
+    ts, tq = (f"**{ts}**", tq) if s["training_mean"] > q["training_mean"] else (ts, f"**{tq}**")
+    t2.append([e, f"{ts} / {tq}", f"{100 * s['falls_mean']:.1f} % / {100 * q['falls_mean']:.1f} %",
+               f"{s['greedy_reached']}/20", f"{num(s['greedy_mean_reached'])} / {num(s['greedy_mean_all'])}",
+               f"{100 * s['snap_ok_mean']:.1f} %"])
+data_table(t2, [0.4, 1.8, 1.35, 0.95, 1.3, 1.1],
            "**Table 2 [supp.].** 20 seeds, mean ± std; S = SARSA, Q = Q-learning; bold = better training "
-           "return. SARSA's final greedy return is averaged over the runs that reach G only (a failed run "
-           "has no finite return), so it is conditional on success. Q-learning reaches G on 20/20 seeds "
-           "with return −11 and in 100 % of snapshots at every ε.")
+           "return. Falls: share of the last 500 training episodes with at least one cliff transition "
+           "(reward −75). SARSA's greedy return is given over the runs that reach G and over all 20 runs, "
+           "where a policy that never reaches G scores −400 at the 400-step cap. Q-learning reaches G on "
+           "20/20 seeds with return −11 and in 100 % of snapshots at every ε.")
 para("**Exploration and training return.** Larger ε means more random moves and more falls, but the cost "
      "depends on where the agent walks. On the edge, Q-learning falls in 2.3 % → 46.5 % of episodes as ε "
-     "goes from 0.01 to 0.3; SARSA, away from the edge, in 0.2 % → 18.2 %. Training return drops for both, "
+     "goes from 0.01 to 0.3; SARSA, away from the edge, in 0.2 % → 15.6 %. Training return drops for both, "
      "much faster for Q-learning (−13.0 → −85.5 vs −16.5 → −46.6), and the ranking reverses: Q-learning "
      "trains better at ε = 0.01, they are level at 0.05, and SARSA is better from 0.1 on.")
 para("**Final greedy evaluation.** Q-learning's greedy policy is optimal (−11) at every ε and seed, because "
      "its target does not depend on ε. SARSA's greedy path stays on the detour at every ε and becomes less "
      "reliable as ε grows: the share of late snapshots whose greedy policy reaches G falls from 98.6 % to "
-     "60.6 %, and at ε = 0.3, 5 of 20 final policies never reach G.")
+     "60.6 %. At ε = 0.3, 5 of 20 final policies never reach G, which pulls the all-seed mean (capped "
+     "at 400 steps) to −112.7 although the successful runs average −16.9.")
 para("**These failures are not a bug.** The spec notes that a greedy policy which fails to reach G signals "
      "a bug, because this cannot happen ~at convergence~. Constant-α SARSA does not converge: its target "
      "samples a′ from the exploring policy (a random a′ near the cliff is worth about −100), and with "
      "α = 0.5 each noisy target moves Q halfway, so near-tied actions keep swapping. A greedy policy can "
      "then contain a loop. For example, at S (ε = 0.2, seed 3) Q(up) = −24.02 < Q(down) = −23.85, and "
      "~down~ bumps the border, so the greedy agent never leaves S; the ε-greedy behaviour escapes such "
-     "loops, so training is unaffected. Q-learning, whose target is deterministic here, never fails, and "
-     "all five graded SARSA runs (ε = 0.1, results.json) reach G.")
-para("**Too little exploration also has a cost.** At ε = 0.01 the edge path is nearly the best choice even "
-     "for SARSA's own objective: executed with ε = 0.01, the edge path earns −12.8 against −17.0 for "
-     "SARSA's detour (Figure 6). Yet SARSA does not find it. Even in a 20,000-episode run at ε = 0.01 "
-     "[supp.] its greedy path only drifts from row 0 to rows 1–2. Early episodes, with Q initialised at 0, "
+     "loops, so training is unaffected. Table 4 confirms the diagnosis: q*_ε reaches G at every ε, and on "
+     "the same 20 seeds α = 0.1 or a decaying α gives no failures at any ε (late-snapshot stability "
+     "98–100 %). Q-learning, whose target has no sampled action, never fails, and all five graded SARSA "
+     "runs (ε = 0.1, results.json) reach G.")
+para("**Too little exploration also has a cost.** At ε = 0.01 the edge is optimal even for SARSA's own "
+     "objective (q*_ε runs along row 3, Table 4), yet SARSA rarely finds it: "
+     "1 of 20 runs with α = 0.1, none with α = 0.5. In a 20,000-episode run at ε = 0.01 [supp.] its greedy path only drifts from row 0 to rows 1–2. Early episodes, with Q initialised at 0, "
      "fall off the cliff often, so edge actions start with very negative values; with ε = 0.01 they are "
      "almost never retried, and those estimates are not corrected. In short, **ε trades training cost "
      "against discovery and, for SARSA, against greedy reliability.**")
@@ -342,10 +387,11 @@ heading("5  Conclusions")
 bullet("**DP:** PI and VI give identical V* and policies. VI needs 12 sweeps; PI needs 9 rounds but 3,276 "
        "evaluation sweeps, because early policies loop and (cold-started) evaluation converges only at rate γ.")
 bullet("**On- vs off-policy:** Q-learning learns q* and the edge path (highest_row 3.0, return −11). SARSA "
-       "learns the value of its ε-greedy behaviour, prices in the 2.5 % per-step fall risk and detours "
-       "(highest_row 0.2, return −16.6).")
+       "learns the value of its ε-greedy behaviour and prices in the 2.5 % per-step fall risk; that alone "
+       "moves it one row up (q*_ε: row 2, −13), and the constant α = 0.5 adds the rest (highest_row 0.2, "
+       "return −16.6).")
 bullet("**ε:** higher ε raises falls and lowers training return, far more for Q-learning, and makes SARSA's "
-       "greedy policy less reliable (98.6 % → 60.6 %). Very small ε reverses the training-return ranking and "
+       "greedy policy less reliable (98.6 % → 60.6 %), a step-size effect that vanishes with α = 0.1. Very small ε reverses the training-return ranking and "
        "starves SARSA of the exploration it needs to revise early estimates.")
 bullet("**Training vs greedy:** SARSA wins while exploring (−20.9 vs −31.7 at ε = 0.1), Q-learning wins "
        "without exploration (−11.0 vs −16.6); the crossover is near ε ≈ 0.04.")

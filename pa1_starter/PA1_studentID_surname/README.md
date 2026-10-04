@@ -1,4 +1,4 @@
-# PA1 — <your name>, <student ID>
+# PA1 — Seher Kanwal, <student ID>
 
 From Bellman updates to TD control: dynamic programming on RoomsGridWorld,
 SARSA and Q-learning on CliffWalk.
@@ -57,10 +57,30 @@ greedy snapshots and use a per-episode ε. It uses the same update rules and
 bit-identical to `agent.sarsa` / `agent.q_learning` for seeds 0–4. All runs
 completed; none were dropped.
 
+**Cliff falls** (report Table 2, Figure 4b; `summary.csv`) are counted as the
+share of the last 500 training episodes that contain at least one actual cliff
+transition (reward −75). An earlier version used "episode return < −60" as a
+proxy, which also counted long SARSA episodes without any fall (e.g. 18.2 %
+instead of 15.6 % at ε = 0.3); the proxy is no longer used. `sweep_summary.py`
+gets the counts by replaying each saved run with `agent.sarsa` / `agent.q_learning`
+in a CliffWalk that counts cliff transitions, and asserts that the replayed
+returns equal the saved ones.
+
 The supplementary runs also produced failed greedy policies, i.e. runs whose
 final greedy policy does not reach G. All are reported, not dropped:
 - C (20 seeds): 1/20 at ε = 0.1, 1/20 at ε = 0.2, 5/20 at ε = 0.3
 - D: seed 3
+
+### Report figures
+
+```powershell
+python report_figures.py      # figures/report_fig1..6_*.png, the six figures in report.pdf
+```
+
+Reads `results/*.npz` and `results_extra/extra_results.json`; nothing is
+retrained. Figures 1, 2 and 5 show the same data as the three required figures
+from `evaluate.py`, laid out at their printed size; Figures 3, 4 and 6 redraw
+experiments B, C and E. The report's tables are filled from the same files.
 
 ### ε sweep (report question 3)
 
@@ -152,8 +172,14 @@ Claude (Anthropic), used through Claude Code in VS Code.
 
 - **Supplementary experiments:** the assistant designed and wrote
   `extra_experiments.py` and its figures.
+- **Corrections after review (by the assistant):** the cliff-fall count in
+  `extra_experiments.py` and `sweep_summary.py` (actual −75 transitions instead
+  of a return threshold); `evaluate.py` now loads exactly the seeds listed in
+  `configs/pa1.yaml`; `agent.policy_evaluation(..., sweeps=0)` now performs no
+  sweep. None of these changes any number in `results.json` (re-run and checked
+  byte for byte).
 - **Report (`report.pdf`):** the assistant drafted the report text, tables and
-  layout from these results. I reviewed and edited it, and I take
+  layout from these results, and wrote `report_figures.py`. I reviewed and edited it, and I take
   responsibility for its content.
 
 I have checked the results and can explain every line of the submitted code.
