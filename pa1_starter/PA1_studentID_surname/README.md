@@ -35,6 +35,32 @@ All hyperparameters come from `configs/pa1.yaml` (α = 0.5, ε = 0.1, 3000 episo
 400-step cap, θ = 1e-12, seeds 0–4). Re-running `train.py` reproduces
 `results.json` byte for byte.
 
+### Supplementary experiments for the report (figures marked [supp.])
+
+```powershell
+python extra_experiments.py   # ~40 s; results_extra/extra_results.json + figures/extra_*.png
+```
+
+| Experiment | Report | Seeds | Figure |
+|---|---|---|---|
+| A: PI vs VI convergence trace | Q1 | — (deterministic) | `extra_A_pi_vs_vi.png` |
+| B: learned value maps max_a Q (uses `results/*.npz`) | Q2 | 0–4 | `extra_B_value_maps.png` |
+| C: ε sweep with greedy-policy stability | Q3 | 0–19 | `extra_C_epsilon_sweep_20seeds.png`, `extra_C_learning_curves_by_eps.png` |
+| D: SARSA, ε = 0.01, 20,000 episodes | Q3 | 0–4 | `extra_F_sarsa_optimal_path.png` (c) |
+| E: frozen policies executed at several ε, no learning (2,000 episodes each) | Q4 | 0–4 (execution rng 999–1004) | `extra_E_cross_evaluation.png` |
+| F: ε decayed linearly 0.1 → 0 | Q4 | 0–19 | `extra_F_sarsa_optimal_path.png` (a, b) |
+
+The script re-implements the training loop only so that it can record per-episode
+greedy snapshots and use a per-episode ε. It uses the same update rules and
+`agent.epsilon_greedy`. On start-up it asserts that its Q tables and returns are
+bit-identical to `agent.sarsa` / `agent.q_learning` for seeds 0–4. All runs
+completed; none were dropped.
+
+The supplementary runs also produced failed greedy policies, i.e. runs whose
+final greedy policy does not reach G. All are reported, not dropped:
+- C (20 seeds): 1/20 at ε = 0.1, 1/20 at ε = 0.2, 5/20 at ε = 0.3
+- D: seed 3
+
 ### ε sweep (report question 3)
 
 ```powershell
@@ -123,9 +149,13 @@ Claude (Anthropic), used through Claude Code in VS Code.
   `pa1_check_submission.py`.
 - **This README:** drafted by the assistant from the actual run output.
 
-I have checked the results and can explain every line of the submitted code.
+- **Supplementary experiments:** the assistant designed and wrote
+  `extra_experiments.py` and its figures.
+- **Report (`report.pdf`):** the assistant drafted the report text, tables and
+  layout from these results. I reviewed and edited it, and I take
+  responsibility for its content.
 
-<!-- TODO: add the report if the assistant helped with it. -->
+I have checked the results and can explain every line of the submitted code.
 
 ## Notes
 
