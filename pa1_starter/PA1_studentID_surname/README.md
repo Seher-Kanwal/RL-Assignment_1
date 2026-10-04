@@ -38,7 +38,7 @@ All hyperparameters come from `configs/pa1.yaml` (α = 0.5, ε = 0.1, 3000 episo
 ### Supplementary experiments for the report (figures marked [supp.])
 
 ```powershell
-python extra_experiments.py   # ~40 s; results_extra/extra_results.json + figures/extra_*.png
+python extra_experiments.py   # ~70 s; results_extra/extra_results.json + figures/extra_*.png
 ```
 
 | Experiment | Report | Seeds | Figure |
@@ -49,6 +49,7 @@ python extra_experiments.py   # ~40 s; results_extra/extra_results.json + figure
 | D: SARSA, ε = 0.01, 20,000 episodes | Q3 | 0–4 | `extra_F_sarsa_optimal_path.png` (c) |
 | E: frozen policies executed at several ε, no learning (2,000 episodes each) | Q4 | 0–4 (execution rng 999–1004) | `extra_E_cross_evaluation.png` |
 | F: ε decayed linearly 0.1 → 0 | Q4 | 0–19 | `extra_F_sarsa_optimal_path.png` (a, b) |
+| G: SARSA greedy failures, using the exact fixed point q*_ε and α ∈ {0.5, 0.1, 0.5/(1+n/50)} | Q2, Q3 | 0–19 | report Table 4 |
 
 The script re-implements the training loop only so that it can record per-episode
 greedy snapshots and use a per-episode ε. It uses the same update rules and
@@ -181,17 +182,32 @@ I have checked the results and can explain every line of the submitted code.
     as in `results.json`
 - **Greedy-path figure:** all five seeds are drawn for each algorithm, slightly
   offset so that identical paths stay visible.
-- **SARSA greedy failures at high ε:** in two sweep runs (SARSA, seed 3, at
-  ε = 0.2 and ε = 0.3), the greedy policy loops until the 400-step cap. This is
-  not an implementation error: the same code matches a reference SARSA exactly
-  at the spec's ε = 0.1, where all greedy policies reach G. The cause:
-  - With a constant α = 0.5, SARSA's Q values keep fluctuating and never settle
-    to fixed values, so the spec's "at convergence" guarantee does not apply.
-  - At high ε, the on-policy values of neighbouring actions are nearly equal.
-    At ε = 0.2, seed 3 has Q(S, up) = −24.02 and Q(S, down) = −23.85, where
-    "down" bumps the border and stays at S.
-  - The ε-greedy behaviour policy escapes such loops through its random moves.
-    The purely greedy policy cannot.
+- **SARSA greedy failures (supplementary runs only).** The spec says a greedy
+  policy that fails to reach G indicates a bug "at convergence". In the
+  supplementary runs, some final SARSA greedy policies loop until the 400-step
+  cap:
+  - 5-seed sweep: seed 3 at ε = 0.2 and at ε = 0.3
+  - 20-seed runs: 1/20 at ε = 0.1, 1/20 at ε = 0.2, 5/20 at ε = 0.3
+
+  All graded runs (ε = 0.1, seeds 0–4) reach G. Experiment G
+  (`extra_experiments.py`, report Table 4) shows these failures are
+  non-convergence under the prescribed constant α = 0.5, not a bug:
+  1. **The convergence target is fine.** SARSA's convergence target, the optimal
+     ε-greedy values q*_ε solved exactly from the model, has a greedy policy that
+     reaches G at every ε.
+  2. **The failures disappear when SARSA can converge.** On the same 20 seeds,
+     α = 0.1 or α = 0.5/(1 + n(s,a)/50) gives 0/20 failures at every ε and a stable
+     greedy policy in 98–100 % of late snapshots. At ε = 0.1, α = 0.1 learns
+     exactly q*_ε's path (row 2, −13) on all 20 seeds.
+  3. **The implementation is verified.** The code matches a reference SARSA bit
+     for bit.
+
+  The mechanism: SARSA's target samples a′ from the exploring policy, and with
+  α = 0.5 each sample moves Q halfway, so near-tied actions keep swapping. For
+  example, at ε = 0.2, seed 3 has Q(S, up) = −24.02 < Q(S, down) = −23.85, and
+  "down" bumps the border. Q-learning's max-target has no sampled action, so it
+  converges even with α = 0.5 and never fails. The same α effect is why SARSA
+  with α = 0.5 climbs to rows 0–1 rather than the row 2 that q*_ε predicts.
 - `train.py` change for the sweep: the output folder is created with
   `mkdir(parents=True, exist_ok=True)`, so that nested sweep paths work.
 - `pa1_envs.py` is unmodified.

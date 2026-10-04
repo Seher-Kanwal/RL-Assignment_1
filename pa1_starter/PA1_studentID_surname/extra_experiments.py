@@ -15,6 +15,7 @@ asserts that this loop reproduces agent.sarsa / agent.q_learning bit for bit.
     D  SARSA at epsilon = 0.01 for 20000 episodes                 (report Q3)
     E  cross-evaluation: learned policies executed at various ε   (report Q4)
     F  decaying epsilon (0.1 -> 0) for SARSA and Q-learning       (report Q4)
+    G  SARSA greedy failures: fixed point q*_eps and step size   (report Q2/Q3)
 
 Outputs: results_extra/*.json and figures/extra_*.png
 """
@@ -67,27 +68,37 @@ def greedy_path(env, Q, max_steps=MAX_STEPS):
     return total, path, False
 
 
-def train(env, algo, eps_schedule, episodes, seed, snapshot_from=None):
+def train(env, algo, eps_schedule, episodes, seed, snapshot_from=None, alpha_fn=None):
     """SARSA / Q-learning exactly as in agent.py, with a per-episode epsilon.
 
-    Returns dict with Q, returns, and (if snapshot_from is set) for every episode
-    >= snapshot_from whether the greedy policy at that moment reaches G.
+    Returns dict with Q, returns, falls (number of cliff transitions, reward -75, per
+    episode) and (if snapshot_from is set) for every episode >= snapshot_from whether
+    the greedy policy at that moment reaches G.
     """
     rng = np.random.default_rng(seed)
     Q = np.zeros((env.n_states, env.n_actions))
-    returns, snaps, rows = [], [], []
+    visits = np.zeros_like(Q)
+    returns, falls, snaps, rows = [], [], [], []
+
+    def step_size(s, a):
+        if alpha_fn is None:
+            return ALPHA
+        visits[s, a] += 1
+        return alpha_fn(visits[s, a])
+
     for ep in range(episodes):
         eps = eps_schedule(ep)
         s, _ = env.reset()
-        G = 0.0
+        G, n_falls = 0.0, 0
         if algo == "sarsa":
             a = agent.epsilon_greedy(Q, s, eps, rng)
             for _ in range(MAX_STEPS):
                 s2, r, term, _, _ = env.step(a)
                 G += r
+                n_falls += r == env.cliff_reward
                 a2 = agent.epsilon_greedy(Q, s2, eps, rng)
                 target = r if term else r + env.gamma * Q[s2, a2]
-                Q[s, a] += ALPHA * (target - Q[s, a])
+                Q[s, a] += step_size(s, a) * (target - Q[s, a])
                 s, a = s2, a2
                 if term:
                     break
@@ -96,17 +107,19 @@ def train(env, algo, eps_schedule, episodes, seed, snapshot_from=None):
                 a = agent.epsilon_greedy(Q, s, eps, rng)
                 s2, r, term, _, _ = env.step(a)
                 G += r
+                n_falls += r == env.cliff_reward
                 target = r if term else r + env.gamma * np.max(Q[s2])
-                Q[s, a] += ALPHA * (target - Q[s, a])
+                Q[s, a] += step_size(s, a) * (target - Q[s, a])
                 s = s2
                 if term:
                     break
         returns.append(G)
+        falls.append(n_falls)
         if snapshot_from is not None and ep >= snapshot_from:
             _, path, ok = greedy_path(env, Q)
             snaps.append(ok)
             rows.append(min(x // env.n_cols for x in path))
-    return {"Q": Q, "returns": np.array(returns), "snap_ok": np.array(snaps),
+    return {"Q": Q, "returns": np.array(returns), "falls": np.array(falls), "snap_ok": np.array(snaps),
             "snap_row": np.array(rows)}
 
 
@@ -287,7 +300,9 @@ def experiment_C():
                 ret, path, ok = greedy_path(env, out["Q"])
                 rows.append({
                     "training": float(out["returns"][-WINDOW:].mean()),
-                    "falls": float((out["returns"][-WINDOW:] < -60).mean()),
+                    # share of the last 500 episodes with at least one actual cliff transition
+                    # (a return threshold would also count long episodes without a fall)
+                    "falls": float((out["falls"][-WINDOW:] > 0).mean()),
                     "greedy": ret, "reached": ok,
                     "highest_row": min(x // env.n_cols for x in path),
                     "snap_ok": float(out["snap_ok"].mean()),
@@ -301,6 +316,8 @@ def experiment_C():
                 "greedy_reached": int(np.sum(agg["reached"])),
                 "greedy_median": float(np.median(agg["greedy"])),
                 "greedy_mean_reached": float(np.mean([g for g, ok in zip(agg["greedy"], agg["reached"]) if ok])),
+                # all seeds; a failed greedy policy scores -400 at the 400-step cap
+                "greedy_mean_all": float(np.mean(agg["greedy"])),
                 "highest_row_median": float(np.median(agg["highest_row"])),
                 "highest_row_mean": float(np.mean(agg["highest_row"])),
                 "snap_ok_mean": float(np.mean(agg["snap_ok"])), "snap_ok_std": float(np.std(agg["snap_ok"])),
@@ -389,7 +406,7 @@ def run_policy(env, Q, eps, n_episodes, seed):
         for _ in range(MAX_STEPS):
             a = agent.epsilon_greedy(Q, s, eps, rng)
             s, r, term, _, _ = env.step(a)
-            G += r; f += r == -75
+            G += r; f += r == env.cliff_reward
             if term:
                 break
         rets.append(G); falls.append(f)
@@ -478,6 +495,54 @@ def experiment_F(episodes=3000):
     return res
 
 
+# ------------------------------------------------------------------ G: are SARSA's greedy failures a bug?
+def eps_soft_optimal_q(env, eps):
+    """Fixed point SARSA converges to with an epsilon-greedy policy (and suitable step sizes):
+    Q = r + gamma * [(1 - eps) max_a' Q(s', a') + eps * mean_a' Q(s', a')], computed from the model."""
+    NS = np.array([[env.P[s][a][0][1] for a in range(4)] for s in range(env.n_states)])
+    R = np.array([[env.P[s][a][0][2] for a in range(4)] for s in range(env.n_states)])
+    D = np.array([[env.P[s][a][0][3] for a in range(4)] for s in range(env.n_states)], float)
+    Q = np.zeros((env.n_states, 4))
+    while True:
+        V = (1 - eps) * Q.max(1) + eps * Q.mean(1)
+        Qn = R + env.gamma * V[NS] * (1 - D)
+        if np.abs(Qn - Q).max() < 1e-12:
+            return Qn
+        Q = Qn
+
+
+def experiment_G():
+    env = CliffWalk()
+    res = {"fixed_point": {}, "sarsa": {}}
+    for eps in [0.01, 0.05, 0.1, 0.2, 0.3]:
+        ret, path, ok = greedy_path(env, eps_soft_optimal_q(env, eps))
+        res["fixed_point"][str(eps)] = {"reaches_G": ok, "greedy_return": ret,
+                                        "highest_row": min(x // env.n_cols for x in path)}
+        print(f"  G fixed point q*_eps, eps={eps}: reaches G {ok}, return {ret}, highest row "
+              f"{res['fixed_point'][str(eps)]['highest_row']}")
+    step_sizes = {"alpha = 0.5 (spec)": None,
+                  "alpha = 0.1": lambda n: 0.1,
+                  "alpha = 0.5/(1+n/50)": lambda n: 0.5 / (1 + n / 50)}
+    for name, fn in step_sizes.items():
+        res["sarsa"][name] = {}
+        for eps in [0.01, 0.1, 0.2, 0.3]:
+            rows = []
+            for seed in range(20):
+                out = train(env, "sarsa", lambda ep, e=eps: e, EPISODES, seed,
+                            snapshot_from=EPISODES - WINDOW, alpha_fn=fn)
+                ret, path, ok = greedy_path(env, out["Q"])
+                rows.append((ret, min(x // env.n_cols for x in path), ok, out["snap_ok"].mean()))
+            r = np.array(rows, dtype=float)
+            res["sarsa"][name][str(eps)] = {
+                "final_fail": int(20 - r[:, 2].sum()), "stability": float(r[:, 3].mean()),
+                "greedy_mean_reached": float(r[r[:, 2] == 1, 0].mean()),
+                "highest_row_counts": {int(k): int(v) for k, v in zip(*np.unique(r[:, 1], return_counts=True))}}
+            x = res["sarsa"][name][str(eps)]
+            print(f"  G {name:22s} eps={eps:<4}: fails {x['final_fail']}/20, stability {x['stability']:.3f}, "
+                  f"greedy {x['greedy_mean_reached']:.2f}, rows {x['highest_row_counts']}")
+    return res
+
+
 def figure_FD(resF, resD):
     """Can SARSA reach the optimal (cliff-edge) path? Decaying epsilon and a long run."""
     curves = _CACHE["F_curves"]
@@ -545,7 +610,7 @@ def main():
     check_equivalence()
     results = {}
     for name, fn in [("A", experiment_A), ("B", experiment_B), ("E", experiment_E),
-                     ("F", experiment_F), ("D", experiment_D), ("C", experiment_C)]:
+                     ("F", experiment_F), ("D", experiment_D), ("C", experiment_C), ("G", experiment_G)]:
         t = time.time()
         print(f"experiment {name} ...")
         results[name] = fn()

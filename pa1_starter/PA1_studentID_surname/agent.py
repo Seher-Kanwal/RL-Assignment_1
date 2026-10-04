@@ -38,6 +38,9 @@ def policy_evaluation(env: TabularEnv, policy: np.ndarray,
     V = np.zeros(env.n_states)      # V = 0 everywhere, including terminal states
     k = 0                           # sweeps performed; the first pass is sweep 1
 
+    if sweeps is not None and sweeps < 1:
+        return V, 0                 # zero sweeps requested: V stays at its initial 0
+
     while True:
         V_old = V.copy()            # synchronous: read only from V_k
         delta = 0.0                 # largest change in this sweep

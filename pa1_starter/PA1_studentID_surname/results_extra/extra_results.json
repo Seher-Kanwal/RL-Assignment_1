@@ -1568,6 +1568,7 @@
     "greedy_reached": 20,
     "greedy_median": -17.0,
     "greedy_mean_reached": -16.1,
+    "greedy_mean_all": -16.1,
     "highest_row_median": 0.0,
     "highest_row_mean": 0.45,
     "snap_ok_mean": 0.9859,
@@ -1762,6 +1763,7 @@
     "greedy_reached": 20,
     "greedy_median": -11.0,
     "greedy_mean_reached": -11.0,
+    "greedy_mean_all": -11.0,
     "highest_row_median": 3.0,
     "highest_row_mean": 3.0,
     "snap_ok_mean": 1.0,
@@ -1954,10 +1956,11 @@
    "sarsa": {
     "training_mean": -20.0035,
     "training_std": 3.002329687093008,
-    "falls_mean": 0.0238,
+    "falls_mean": 0.0193,
     "greedy_reached": 20,
     "greedy_median": -17.0,
     "greedy_mean_reached": -16.3,
+    "greedy_mean_all": -16.3,
     "highest_row_median": 0.0,
     "highest_row_mean": 0.4,
     "snap_ok_mean": 0.9459000000000002,
@@ -1965,7 +1968,7 @@
     "per_seed": [
      {
       "training": -17.816,
-      "falls": 0.01,
+      "falls": 0.006,
       "greedy": -15.0,
       "reached": true,
       "highest_row": 1,
@@ -1983,7 +1986,7 @@
      },
      {
       "training": -22.554,
-      "falls": 0.044,
+      "falls": 0.028,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -2010,7 +2013,7 @@
      },
      {
       "training": -31.072,
-      "falls": 0.082,
+      "falls": 0.038,
       "greedy": -15.0,
       "reached": true,
       "highest_row": 1,
@@ -2019,7 +2022,7 @@
      },
      {
       "training": -19.102,
-      "falls": 0.032,
+      "falls": 0.03,
       "greedy": -15.0,
       "reached": true,
       "highest_row": 1,
@@ -2037,7 +2040,7 @@
      },
      {
       "training": -19.308,
-      "falls": 0.022,
+      "falls": 0.02,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -2064,7 +2067,7 @@
      },
      {
       "training": -19.458,
-      "falls": 0.022,
+      "falls": 0.02,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -2091,7 +2094,7 @@
      },
      {
       "training": -20.038,
-      "falls": 0.016,
+      "falls": 0.012,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -2118,7 +2121,7 @@
      },
      {
       "training": -19.644,
-      "falls": 0.02,
+      "falls": 0.018,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -2136,7 +2139,7 @@
      },
      {
       "training": -24.866,
-      "falls": 0.05,
+      "falls": 0.036,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 1,
@@ -2152,6 +2155,7 @@
     "greedy_reached": 20,
     "greedy_median": -11.0,
     "greedy_mean_reached": -11.0,
+    "greedy_mean_all": -11.0,
     "highest_row_median": 3.0,
     "highest_row_mean": 3.0,
     "snap_ok_mean": 1.0,
@@ -2344,10 +2348,11 @@
    "sarsa": {
     "training_mean": -23.6279,
     "training_std": 2.6650356451649952,
-    "falls_mean": 0.04630000000000001,
+    "falls_mean": 0.03930000000000001,
     "greedy_reached": 19,
     "greedy_median": -15.0,
     "greedy_mean_reached": -15.842105263157896,
+    "greedy_mean_all": -35.05,
     "highest_row_median": 1.0,
     "highest_row_mean": 0.6,
     "snap_ok_mean": 0.8802999999999999,
@@ -2355,7 +2360,7 @@
     "per_seed": [
      {
       "training": -24.464,
-      "falls": 0.052,
+      "falls": 0.048,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -2382,7 +2387,7 @@
      },
      {
       "training": -25.53,
-      "falls": 0.068,
+      "falls": 0.05,
       "greedy": -15.0,
       "reached": true,
       "highest_row": 1,
@@ -2400,7 +2405,7 @@
      },
      {
       "training": -21.604,
-      "falls": 0.042,
+      "falls": 0.036,
       "greedy": -15.0,
       "reached": true,
       "highest_row": 1,
@@ -2409,7 +2414,7 @@
      },
      {
       "training": -23.94,
-      "falls": 0.038,
+      "falls": 0.036,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -2418,7 +2423,7 @@
      },
      {
       "training": -22.11,
-      "falls": 0.036,
+      "falls": 0.034,
       "greedy": -15.0,
       "reached": true,
       "highest_row": 1,
@@ -2436,7 +2441,7 @@
      },
      {
       "training": -23.544,
-      "falls": 0.052,
+      "falls": 0.046,
       "greedy": -15.0,
       "reached": true,
       "highest_row": 1,
@@ -2445,7 +2450,7 @@
      },
      {
       "training": -23.91,
-      "falls": 0.04,
+      "falls": 0.036,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -2463,7 +2468,7 @@
      },
      {
       "training": -24.4,
-      "falls": 0.05,
+      "falls": 0.046,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -2472,7 +2477,7 @@
      },
      {
       "training": -22.102,
-      "falls": 0.034,
+      "falls": 0.032,
       "greedy": -15.0,
       "reached": true,
       "highest_row": 1,
@@ -2481,7 +2486,7 @@
      },
      {
       "training": -31.716,
-      "falls": 0.082,
+      "falls": 0.04,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -2490,7 +2495,7 @@
      },
      {
       "training": -29.54,
-      "falls": 0.094,
+      "falls": 0.06,
       "greedy": -15.0,
       "reached": true,
       "highest_row": 1,
@@ -2508,7 +2513,7 @@
      },
      {
       "training": -21.922,
-      "falls": 0.04,
+      "falls": 0.038,
       "greedy": -15.0,
       "reached": true,
       "highest_row": 1,
@@ -2517,7 +2522,7 @@
      },
      {
       "training": -21.77,
-      "falls": 0.036,
+      "falls": 0.032,
       "greedy": -15.0,
       "reached": true,
       "highest_row": 1,
@@ -2526,7 +2531,7 @@
      },
      {
       "training": -23.846,
-      "falls": 0.058,
+      "falls": 0.048,
       "greedy": -400.0,
       "reached": false,
       "highest_row": 1,
@@ -2542,6 +2547,7 @@
     "greedy_reached": 20,
     "greedy_median": -11.0,
     "greedy_mean_reached": -11.0,
+    "greedy_mean_all": -11.0,
     "highest_row_median": 3.0,
     "highest_row_mean": 3.0,
     "snap_ok_mean": 1.0,
@@ -2734,10 +2740,11 @@
    "sarsa": {
     "training_mean": -34.41,
     "training_std": 2.9172378716861602,
-    "falls_mean": 0.10740000000000001,
+    "falls_mean": 0.09050000000000001,
     "greedy_reached": 19,
     "greedy_median": -17.0,
     "greedy_mean_reached": -16.894736842105264,
+    "greedy_mean_all": -36.05,
     "highest_row_median": 0.0,
     "highest_row_mean": 0.3,
     "snap_ok_mean": 0.718,
@@ -2745,7 +2752,7 @@
     "per_seed": [
      {
       "training": -37.57,
-      "falls": 0.126,
+      "falls": 0.098,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -2754,7 +2761,7 @@
      },
      {
       "training": -30.626,
-      "falls": 0.078,
+      "falls": 0.076,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -2763,7 +2770,7 @@
      },
      {
       "training": -33.646,
-      "falls": 0.112,
+      "falls": 0.104,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -2772,7 +2779,7 @@
      },
      {
       "training": -33.894,
-      "falls": 0.092,
+      "falls": 0.088,
       "greedy": -400.0,
       "reached": false,
       "highest_row": 4,
@@ -2790,7 +2797,7 @@
      },
      {
       "training": -31.078,
-      "falls": 0.09,
+      "falls": 0.08,
       "greedy": -19.0,
       "reached": true,
       "highest_row": 0,
@@ -2799,7 +2806,7 @@
      },
      {
       "training": -35.606,
-      "falls": 0.11,
+      "falls": 0.078,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -2808,7 +2815,7 @@
      },
      {
       "training": -34.162,
-      "falls": 0.102,
+      "falls": 0.084,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -2817,7 +2824,7 @@
      },
      {
       "training": -39.07,
-      "falls": 0.138,
+      "falls": 0.114,
       "greedy": -15.0,
       "reached": true,
       "highest_row": 1,
@@ -2826,7 +2833,7 @@
      },
      {
       "training": -33.236,
-      "falls": 0.108,
+      "falls": 0.098,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -2835,7 +2842,7 @@
      },
      {
       "training": -34.876,
-      "falls": 0.114,
+      "falls": 0.096,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -2844,7 +2851,7 @@
      },
      {
       "training": -30.426,
-      "falls": 0.084,
+      "falls": 0.078,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -2853,7 +2860,7 @@
      },
      {
       "training": -37.852,
-      "falls": 0.144,
+      "falls": 0.106,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -2862,7 +2869,7 @@
      },
      {
       "training": -36.546,
-      "falls": 0.148,
+      "falls": 0.12,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -2871,7 +2878,7 @@
      },
      {
       "training": -35.504,
-      "falls": 0.116,
+      "falls": 0.094,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -2880,7 +2887,7 @@
      },
      {
       "training": -39.08,
-      "falls": 0.13,
+      "falls": 0.09,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -2889,7 +2896,7 @@
      },
      {
       "training": -38.044,
-      "falls": 0.106,
+      "falls": 0.08,
       "greedy": -15.0,
       "reached": true,
       "highest_row": 1,
@@ -2898,7 +2905,7 @@
      },
      {
       "training": -32.762,
-      "falls": 0.1,
+      "falls": 0.092,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -2907,7 +2914,7 @@
      },
      {
       "training": -34.078,
-      "falls": 0.096,
+      "falls": 0.08,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -2932,6 +2939,7 @@
     "greedy_reached": 20,
     "greedy_median": -11.0,
     "greedy_mean_reached": -11.0,
+    "greedy_mean_all": -11.0,
     "highest_row_median": 3.0,
     "highest_row_mean": 3.0,
     "snap_ok_mean": 1.0,
@@ -3124,10 +3132,11 @@
    "sarsa": {
     "training_mean": -46.5895,
     "training_std": 3.4029075141707863,
-    "falls_mean": 0.1816,
+    "falls_mean": 0.1561,
     "greedy_reached": 15,
     "greedy_median": -17.0,
     "greedy_mean_reached": -16.866666666666667,
+    "greedy_mean_all": -112.65,
     "highest_row_median": 0.0,
     "highest_row_mean": 0.25,
     "snap_ok_mean": 0.6061,
@@ -3135,7 +3144,7 @@
     "per_seed": [
      {
       "training": -47.078,
-      "falls": 0.192,
+      "falls": 0.16,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -3144,7 +3153,7 @@
      },
      {
       "training": -54.4,
-      "falls": 0.248,
+      "falls": 0.19,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -3153,7 +3162,7 @@
      },
      {
       "training": -50.972,
-      "falls": 0.188,
+      "falls": 0.154,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -3162,7 +3171,7 @@
      },
      {
       "training": -51.532,
-      "falls": 0.202,
+      "falls": 0.156,
       "greedy": -400.0,
       "reached": false,
       "highest_row": 0,
@@ -3171,7 +3180,7 @@
      },
      {
       "training": -44.64,
-      "falls": 0.164,
+      "falls": 0.15,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -3180,7 +3189,7 @@
      },
      {
       "training": -45.134,
-      "falls": 0.178,
+      "falls": 0.154,
       "greedy": -400.0,
       "reached": false,
       "highest_row": 0,
@@ -3189,7 +3198,7 @@
      },
      {
       "training": -47.584,
-      "falls": 0.202,
+      "falls": 0.176,
       "greedy": -15.0,
       "reached": true,
       "highest_row": 1,
@@ -3198,7 +3207,7 @@
      },
      {
       "training": -39.282,
-      "falls": 0.144,
+      "falls": 0.136,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -3207,7 +3216,7 @@
      },
      {
       "training": -47.788,
-      "falls": 0.2,
+      "falls": 0.172,
       "greedy": -400.0,
       "reached": false,
       "highest_row": 0,
@@ -3216,7 +3225,7 @@
      },
      {
       "training": -44.654,
-      "falls": 0.174,
+      "falls": 0.162,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -3225,7 +3234,7 @@
      },
      {
       "training": -49.456,
-      "falls": 0.19,
+      "falls": 0.168,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -3234,7 +3243,7 @@
      },
      {
       "training": -49.1,
-      "falls": 0.18,
+      "falls": 0.158,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -3243,7 +3252,7 @@
      },
      {
       "training": -45.358,
-      "falls": 0.182,
+      "falls": 0.158,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -3252,7 +3261,7 @@
      },
      {
       "training": -47.796,
-      "falls": 0.184,
+      "falls": 0.17,
       "greedy": -400.0,
       "reached": false,
       "highest_row": 0,
@@ -3261,7 +3270,7 @@
      },
      {
       "training": -45.632,
-      "falls": 0.174,
+      "falls": 0.16,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -3270,7 +3279,7 @@
      },
      {
       "training": -43.782,
-      "falls": 0.168,
+      "falls": 0.138,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -3279,7 +3288,7 @@
      },
      {
       "training": -42.766,
-      "falls": 0.15,
+      "falls": 0.124,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -3288,7 +3297,7 @@
      },
      {
       "training": -45.786,
-      "falls": 0.184,
+      "falls": 0.164,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -3297,7 +3306,7 @@
      },
      {
       "training": -46.886,
-      "falls": 0.172,
+      "falls": 0.138,
       "greedy": -400.0,
       "reached": false,
       "highest_row": 4,
@@ -3306,7 +3315,7 @@
      },
      {
       "training": -42.164,
-      "falls": 0.156,
+      "falls": 0.134,
       "greedy": -17.0,
       "reached": true,
       "highest_row": 0,
@@ -3322,6 +3331,7 @@
     "greedy_reached": 20,
     "greedy_median": -11.0,
     "greedy_mean_reached": -11.0,
+    "greedy_mean_all": -11.0,
     "highest_row_median": 3.0,
     "highest_row_mean": 3.0,
     "snap_ok_mean": 1.0,
@@ -3508,6 +3518,151 @@
       "snap_row_mean": 3.0
      }
     ]
+   }
+  }
+ },
+ "G": {
+  "fixed_point": {
+   "0.01": {
+    "reaches_G": true,
+    "greedy_return": -11.0,
+    "highest_row": 3
+   },
+   "0.05": {
+    "reaches_G": true,
+    "greedy_return": -13.0,
+    "highest_row": 2
+   },
+   "0.1": {
+    "reaches_G": true,
+    "greedy_return": -13.0,
+    "highest_row": 2
+   },
+   "0.2": {
+    "reaches_G": true,
+    "greedy_return": -13.0,
+    "highest_row": 2
+   },
+   "0.3": {
+    "reaches_G": true,
+    "greedy_return": -15.0,
+    "highest_row": 1
+   }
+  },
+  "sarsa": {
+   "alpha = 0.5 (spec)": {
+    "0.01": {
+     "final_fail": 0,
+     "stability": 0.9859,
+     "greedy_mean_reached": -16.1,
+     "highest_row_counts": {
+      "0": 11,
+      "1": 9
+     }
+    },
+    "0.1": {
+     "final_fail": 1,
+     "stability": 0.8802999999999999,
+     "greedy_mean_reached": -15.842105263157896,
+     "highest_row_counts": {
+      "0": 8,
+      "1": 12
+     }
+    },
+    "0.2": {
+     "final_fail": 1,
+     "stability": 0.718,
+     "greedy_mean_reached": -16.894736842105264,
+     "highest_row_counts": {
+      "0": 17,
+      "1": 2,
+      "4": 1
+     }
+    },
+    "0.3": {
+     "final_fail": 5,
+     "stability": 0.6061,
+     "greedy_mean_reached": -16.866666666666667,
+     "highest_row_counts": {
+      "0": 18,
+      "1": 1,
+      "4": 1
+     }
+    }
+   },
+   "alpha = 0.1": {
+    "0.01": {
+     "final_fail": 0,
+     "stability": 0.9974999999999999,
+     "greedy_mean_reached": -12.9,
+     "highest_row_counts": {
+      "2": 19,
+      "3": 1
+     }
+    },
+    "0.1": {
+     "final_fail": 0,
+     "stability": 0.9978999999999999,
+     "greedy_mean_reached": -13.0,
+     "highest_row_counts": {
+      "2": 20
+     }
+    },
+    "0.2": {
+     "final_fail": 0,
+     "stability": 0.9948,
+     "greedy_mean_reached": -14.5,
+     "highest_row_counts": {
+      "1": 15,
+      "2": 5
+     }
+    },
+    "0.3": {
+     "final_fail": 0,
+     "stability": 0.9793000000000001,
+     "greedy_mean_reached": -15.1,
+     "highest_row_counts": {
+      "0": 2,
+      "1": 17,
+      "2": 1
+     }
+    }
+   },
+   "alpha = 0.5/(1+n/50)": {
+    "0.01": {
+     "final_fail": 0,
+     "stability": 0.9998000000000001,
+     "greedy_mean_reached": -13.2,
+     "highest_row_counts": {
+      "1": 2,
+      "2": 18
+     }
+    },
+    "0.1": {
+     "final_fail": 0,
+     "stability": 1.0,
+     "greedy_mean_reached": -13.8,
+     "highest_row_counts": {
+      "1": 8,
+      "2": 12
+     }
+    },
+    "0.2": {
+     "final_fail": 0,
+     "stability": 1.0,
+     "greedy_mean_reached": -15.0,
+     "highest_row_counts": {
+      "1": 20
+     }
+    },
+    "0.3": {
+     "final_fail": 0,
+     "stability": 1.0,
+     "greedy_mean_reached": -15.0,
+     "highest_row_counts": {
+      "1": 20
+     }
+    }
    }
   }
  }

@@ -11,6 +11,11 @@ produces:
     figures/epsilon_sweep.png        training return, greedy return, highest row vs epsilon
 
 Only epsilon differs between the runs; every other setting is configs/pa1.yaml.
+
+The .npz files do not record cliff falls, so each run is replayed once with
+agent.sarsa / agent.q_learning in a CliffWalk that counts cliff transitions
+(reward -75). The replayed returns are asserted to equal the saved ones, so the
+counts belong to exactly the saved runs.
 """
 from __future__ import annotations
 
@@ -21,6 +26,10 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+import yaml
+
+import agent
+from pa1_envs import CliffWalk
 
 SWEEP = pathlib.Path("results_sweep")
 FIG = pathlib.Path("figures")
@@ -43,6 +52,36 @@ METRICS = [  # (key, panel title, y label)
 ]
 
 
+class CountingCliffWalk(CliffWalk):
+    """CliffWalk that records the number of cliff transitions in each episode."""
+
+    def __init__(self):
+        super().__init__()
+        self.falls = []
+
+    def reset(self, *args, **kwargs):
+        self.falls.append(0)
+        return super().reset(*args, **kwargs)
+
+    def step(self, action):
+        out = super().step(action)
+        if out[1] == self.cliff_reward:
+            self.falls[-1] += 1
+        return out
+
+
+def cliff_falls(run_dir: pathlib.Path, algo: str, seed: int, saved_returns: np.ndarray) -> np.ndarray:
+    """Per-episode cliff-fall counts of one saved run, by replaying its training."""
+    td = yaml.safe_load((pathlib.Path("configs") / f"{run_dir.name}.yaml").read_text())["td_control"]
+    env = CountingCliffWalk()
+    train_fn = agent.sarsa if algo == "sarsa" else agent.q_learning
+    _, returns = train_fn(env, td["alpha"], td["epsilon"], td["episodes"],
+                          td["max_steps_per_episode"], np.random.default_rng(seed))
+    if not np.array_equal(np.asarray(returns), saved_returns):
+        raise RuntimeError(f"replay of {run_dir.name}/{algo} seed {seed} does not match the saved run")
+    return np.array(env.falls)
+
+
 def load_sweep() -> dict[float, dict[str, dict[str, np.ndarray]]]:
     """{epsilon: {algo: {"training": per-seed array, "greedy": ..., "highest_row": ..., "falls": ...}}}"""
     out = {}
@@ -54,13 +93,13 @@ def load_sweep() -> dict[float, dict[str, dict[str, np.ndarray]]]:
             if not files:
                 raise FileNotFoundError(f"no {algo} runs in {d} — run train.py with configs/{d.name}.yaml")
             data = [np.load(f) for f in files]
+            falls = [cliff_falls(d, algo, int(z["seed"]), z["returns"]) for z in data]
             out[eps][algo] = {
                 "training": np.array([z["returns"][-WINDOW:].mean() for z in data]),
                 "greedy": np.array([float(z["greedy_return"]) for z in data]),
                 "highest_row": np.array([float(z["highest_row"]) for z in data]),
-                # episodes in the last 500 whose return is below -60 contain at least one
-                # cliff fall (-75); a direct measure of how often exploration was punished
-                "falls": np.array([(z["returns"][-WINDOW:] < -60).mean() for z in data]),
+                # share of the last 500 episodes with at least one actual cliff transition
+                "falls": np.array([(f[-WINDOW:] > 0).mean() for f in falls]),
                 # greedy path ends at G (state 49); False = greedy policy loops until the cap
                 "reached": np.array([int(z["greedy_path"][-1]) == 49 for z in data]),
                 "n_seeds": len(files),

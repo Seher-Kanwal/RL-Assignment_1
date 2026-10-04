@@ -21,6 +21,7 @@ import matplotlib
 matplotlib.use("Agg")           # works on headless machines
 import matplotlib.pyplot as plt
 import numpy as np
+import yaml
 from matplotlib.colors import LinearSegmentedColormap
 from matplotlib.patches import Rectangle
 
@@ -29,6 +30,7 @@ from pa1_envs import RoomsGridWorld, CliffWalk
 
 FIG = pathlib.Path("figures")
 RAW = pathlib.Path("results")
+CONFIG = pathlib.Path("configs/pa1.yaml")                # the seeds to load come from here
 
 ALGOS = {"sarsa": "SARSA", "qlearning": "Q-learning"}
 COLORS = {"sarsa": "#2a78d6", "qlearning": "#eb6834"}   # blue, orange (CVD-checked)
@@ -217,10 +219,13 @@ def main():
     cliff = CliffWalk()
     per_seed = {name: [] for name in ALGOS}
     paths = {name: [] for name in ALGOS}
+    # load exactly the configured seeds, so stale files from other seed lists are ignored
+    seeds = yaml.safe_load(CONFIG.read_text())["seeds"]
     for name in ALGOS:
-        files = sorted(RAW.glob(f"{name}_seed*.npz"))
-        if not files:
-            raise FileNotFoundError(f"no {name}_seed*.npz in {RAW}/ — run train.py first")
+        files = [RAW / f"{name}_seed{s}.npz" for s in seeds]
+        missing = [f.name for f in files if not f.exists()]
+        if missing:
+            raise FileNotFoundError(f"missing {missing} in {RAW}/ — run train.py first")
         for f in files:
             data = np.load(f)
             per_seed[name].append(data["returns"])
