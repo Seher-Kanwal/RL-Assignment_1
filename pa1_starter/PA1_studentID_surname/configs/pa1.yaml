@@ -1,0 +1,23 @@
+# PA1 configuration. These values are fixed by the specification — do not
+# change them for the required results. For the epsilon sweep in report
+# question 3, copy this file and vary only `epsilon`.
+
+seeds: [0, 1, 2, 3, 4]        # at least five; report every one you ran
+
+dynamic_programming:
+  theta: 1.0e-12              # convergence threshold, max|V_{k+1} - V_k|
+  policy_eval_sweeps: 10      # for the V_random_10_sweeps item
+  # gamma comes from the environment (RoomsGridWorld: 0.95)
+
+td_control:
+  alpha: 0.5
+  epsilon: 0.1
+  episodes: 3000
+  max_steps_per_episode: 400
+  training_return_window: 500 # mean over the LAST 500 episodes
+  # gamma comes from the environment (CliffWalk: 0.99)
+
+output:
+  results_json: results.json
+  figures_dir: figures
+  raw_dir: results              # per-seed raw output goes here

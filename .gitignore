@@ -1,0 +1,14 @@
+# Virtual environment
+rl2026/
+venv/
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

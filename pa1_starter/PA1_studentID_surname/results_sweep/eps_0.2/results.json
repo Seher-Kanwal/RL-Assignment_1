@@ -1,0 +1,54 @@
+{
+  "gridworld": {
+    "V_random_10_sweeps": {
+      "A": -8.044,
+      "B": -8.389,
+      "C": -8.345,
+      "D": 1.442
+    },
+    "V_random_converged": {
+      "A": -18.945,
+      "B": -16.498,
+      "C": -17.331,
+      "D": -0.675
+    },
+    "V_optimal": {
+      "A": -2.038,
+      "B": 3.213,
+      "C": 0.95,
+      "D": 10.0
+    },
+    "optimal_action": {
+      "A": "up",
+      "B": "right",
+      "C": "up",
+      "D": "up"
+    },
+    "policy_iteration_rounds": 9,
+    "value_iteration_sweeps": 12,
+    "optimal_undiscounted_return_from_start": 0.0
+  },
+  "cliff": {
+    "V_optimal": {
+      "A": -10.466,
+      "B": -9.562,
+      "C": -5.852,
+      "D": -3.94
+    },
+    "optimal_action": {
+      "A": "up",
+      "B": "right",
+      "C": "right",
+      "D": "down"
+    },
+    "value_iteration_sweeps": 14,
+    "optimal_undiscounted_return_from_start": -11.0,
+    "optimal_path_length": 11,
+    "sarsa_training_return": -33.1,
+    "qlearning_training_return": -59.612,
+    "sarsa_greedy_return": -93.6,
+    "qlearning_greedy_return": -11.0,
+    "sarsa_highest_row": 0.8,
+    "qlearning_highest_row": 3.0
+  }
+}

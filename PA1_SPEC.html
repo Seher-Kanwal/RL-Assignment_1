@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Programming Assignment 1 — Reinforcement Learning · Graduate</title>
+<style>
+:root{
+  --ink:#10151C; --muted:#5A6B7D; --rule:#DCE3EA; --panel:#F4F7FA; --paper:#fff;
+  --cyan:#0077A8; --green:#1F8A5F; --amber:#9A6600; --pink:#BE2E64;
+  --term-bg:#0C1118; --term-fg:#E8EEF6; --term-dim:#9CB0C4;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Malgun Gothic","Apple SD Gothic Neo",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+     font-size:16px;line-height:1.65;-webkit-text-size-adjust:100%}
+
+.masthead{border-bottom:2px solid var(--ink);padding:34px 0 22px}
+.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+         color:var(--muted);font-weight:600}
+h1{font-size:38px;line-height:1.15;margin:6px 0 0;letter-spacing:-.02em;font-weight:700}
+.subtitle{font-size:20px;color:var(--muted);margin-top:4px;font-weight:400;letter-spacing:-.01em}
+.deadline{margin-top:16px;font-size:15px;color:var(--ink);
+          border-left:3px solid var(--cyan);padding-left:12px}
+.lede{margin:10px 0 0;max-width:62ch;color:var(--muted);font-size:15px}
+
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+.layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:56px;
+        align-items:start;padding-top:38px;padding-bottom:90px}
+
+nav.toc{position:sticky;top:24px;font-size:13.5px;line-height:1.45}
+nav.toc .toc-label{font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+                   color:var(--muted);font-weight:600;margin-bottom:12px}
+.toc-list{list-style:none;margin:0;padding:0}
+.toc-list ul{list-style:none;margin:3px 0 8px;padding-left:20px;border-left:1px solid var(--rule)}
+.toc-list a{display:block;padding:3px 0;color:var(--muted);text-decoration:none}
+.toc-list a:hover,.toc-list a:focus-visible{color:var(--cyan)}
+.toc-top>li>a{color:var(--ink);font-weight:600;padding:5px 0;display:flex;gap:2px}
+.toc-num{display:inline-block;min-width:2.6em;color:var(--cyan);font-variant-numeric:tabular-nums}
+
+main{min-width:0}
+main h2{font-size:25px;margin:52px 0 4px;padding-top:22px;border-top:1px solid var(--rule);
+        letter-spacing:-.015em;font-weight:700}
+main h2:first-child{margin-top:0;border-top:0;padding-top:0}
+main h3{font-size:17px;margin:30px 0 6px;font-weight:700}
+main h3 code{font-size:.94em;font-weight:700;background:none;padding:0;color:var(--ink)}
+main p{margin:12px 0}
+main a{color:var(--cyan)}
+main ol,main ul{padding-left:22px}
+main li{margin:5px 0}
+strong{font-weight:650}
+
+table{border-collapse:collapse;width:100%;margin:18px 0;font-size:14.5px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{background:var(--panel);font-weight:650;font-size:12.5px;letter-spacing:.04em;
+   text-transform:uppercase;color:var(--muted)}
+
+code{font-family:var(--mono);font-size:.88em;background:var(--panel);
+     padding:.12em .38em;border-radius:3px;word-break:break-word}
+.code{position:relative;margin:16px 0}
+.code pre{margin:0;background:var(--term-bg);color:var(--term-fg);border-radius:6px;
+          padding:16px 18px;overflow-x:auto;font-size:13.5px;line-height:1.6}
+.code pre code{background:none;padding:0;color:inherit;font-size:inherit}
+.copy{position:absolute;top:9px;right:9px;font:600 11px/1 var(--sans);letter-spacing:.06em;
+      text-transform:uppercase;color:var(--term-dim);background:rgba(232,238,246,.09);
+      border:1px solid rgba(232,238,246,.22);border-radius:4px;padding:6px 9px;cursor:pointer;
+      opacity:0;transition:opacity .12s}
+.code:hover .copy,.copy:focus-visible{opacity:1}
+.copy:hover{color:var(--term-fg);background:rgba(232,238,246,.18)}
+.copy.done{color:#3DDC97;border-color:#3DDC97}
+
+.chip{display:inline-block;font:650 11.5px/1 var(--mono);letter-spacing:.06em;
+      padding:3px 7px;border-radius:3px;border:1px solid;white-space:nowrap}
+.chip-ok{color:var(--green);border-color:var(--green);background:rgba(31,138,95,.08)}
+.chip-skip{color:var(--muted);border-color:var(--rule);background:var(--panel)}
+.chip-warn{color:var(--amber);border-color:var(--amber);background:rgba(154,102,0,.08)}
+.chip-fail{color:var(--pink);border-color:var(--pink);background:rgba(190,46,100,.08)}
+
+blockquote{margin:16px 0;padding:2px 0 2px 16px;border-left:3px solid var(--rule);color:var(--muted)}
+footer{border-top:1px solid var(--rule);padding:20px 0 40px;font-size:13px;color:var(--muted)}
+
+@media (max-width:900px){
+  .layout{grid-template-columns:1fr;gap:0;padding-top:26px;padding-bottom:60px}
+  nav.toc{position:static;margin-bottom:34px;padding-bottom:22px;border-bottom:1px solid var(--rule)}
+  h1{font-size:30px}
+  .copy{opacity:1}
+}
+@media print{
+  nav.toc,.copy{display:none}
+  body{font-size:11pt}
+  .layout{display:block;padding:0}
+  .code pre{background:#fff;color:#000;border:1px solid #bbb}
+  main h2{break-after:avoid;page-break-after:avoid}
+  table,.code{break-inside:avoid;page-break-inside:avoid}
+  a{color:inherit;text-decoration:none}
+}
+</style>
+</head>
+<body>
+<header class="masthead"><div class="wrap">
+  <div class="eyebrow">Reinforcement Learning · Graduate</div>
+  <h1>Programming Assignment 1</h1>
+  <div class="subtitle">From Bellman Updates to TD Control</div>
+  <p class="deadline"><strong>Released:</strong> Week 2 · <strong>Due:</strong> end of Week 4, exact deadline announced separately on the LMS · <strong>Weight:</strong> 6% of the course grade</p>
+  <p class="lede">You are given <code>pa1_starter.zip</code> (the submission skeleton, including <code>pa1_envs.py</code> and a <code>results.json</code> to fill in) and <code>pa1_check_submission.py</code> (a format checker for your archive). The environments are not the textbook versions — the grids, rewards and discount factors are specific to this course, and the reference answers were computed from this exact file. <strong>Do not modify <code>pa1_envs.py</code>.</strong></p>
+</div></header>
+
+<div class="wrap layout">
+  <nav class="toc" aria-label="Contents">
+    <div class="toc-label">Contents</div>
+    <ul class="toc-list toc-top"><li><a href="#1-the-environments"><span class="toc-num">1</span>The environments</a><ul class="toc-list"><li><a href="#roomsgridworld-for-dynamic-programming">RoomsGridWorld — for dynamic programming</a></li><li><a href="#cliffwalk-for-td-control">CliffWalk — for TD control</a></li></ul></li><li><a href="#2-conventions-read-this-before-you-write-code"><span class="toc-num">2</span>Conventions — read this before you write code</a></li><li><a href="#3-what-to-implement"><span class="toc-num">3</span>What to implement</a></li><li><a href="#4-how-to-submit"><span class="toc-num">4</span>How to submit</a><ul class="toc-list"><li><a href="#41-check-the-archive-before-you-upload-it"><span class="toc-num">4.1</span>Check the archive before you upload it</a></li><li><a href="#42-resultsjson-the-auto-graded-part"><span class="toc-num">4.2</span>results.json — the auto-graded part</a></li><li><a href="#43-code"><span class="toc-num">4.3</span>Code</a></li><li><a href="#44-report-3-to-4-pages"><span class="toc-num">4.4</span>Report — 3 to 4 pages</a></li><li><a href="#45-required-figures"><span class="toc-num">4.5</span>Required figures</a></li><li><a href="#46-before-you-upload"><span class="toc-num">4.6</span>Before you upload</a></li></ul></li><li><a href="#5-marking"><span class="toc-num">5</span>Marking</a></li><li><a href="#6-notes"><span class="toc-num">6</span>Notes</a></li></ul>
+  </nav>
+  <main><h2 id="1-the-environments">1. The environments</h2>
+<h3 id="roomsgridworld-for-dynamic-programming">RoomsGridWorld — for dynamic programming</h3>
+<div class="code"><button class="copy" type="button" aria-label="Copy command">Copy</button><pre><code>. . . . . . G          S  start (state 35)
+. # # . . # .          G  goal,   +10, terminal
+. . . . # . .          H  hazard,  -8, terminal
+. # . . H . .          #  wall
+. # . # # . .
+S . . . . . .          every move: -1
+</code></pre></div>
+<p>6 × 7 grid, 42 states, γ = <strong>0.95</strong>. Moving into a wall or off the border leaves you where you are and still costs −1.</p>
+<h3 id="cliffwalk-for-td-control">CliffWalk — for TD control</h3>
+<div class="code"><button class="copy" type="button" aria-label="Copy command">Copy</button><pre><code>. . . . . . . . . .    S  start (state 40)
+. . . . . . . . . .    G  goal, terminal
+. . . . . . . . . .    C  cliff: −75 and you are returned to S,
+. . . . . . . . . .       but the episode does NOT end
+S C C C C C C C C G
+                       every move: -1
+</code></pre></div>
+<p>5 × 10 grid, 50 states, γ = <strong>0.99</strong>.</p>
+<p>Actions in both: <code>0 = up, 1 = right, 2 = down, 3 = left</code>. States are row-major, <code>state = row * n_cols + col</code>. The model is exposed as <code>env.P[s][a] -&gt; [(prob, next_state, reward, terminated)]</code>.</p>
+
+<h2 id="2-conventions-read-this-before-you-write-code">2. Conventions — read this before you write code</h2>
+<p>Your numeric answers are checked against a reference implementation. These conventions decide the numbers, so follow them exactly.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Rule</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Policy evaluation</td>
+<td><strong>Synchronous</strong>: read from <code>V_k</code>, write into a separate <code>V_{k+1}</code>. Not in-place</td>
+</tr>
+<tr>
+<td>Initialisation</td>
+<td><code>V = 0</code> everywhere, including terminal states</td>
+</tr>
+<tr>
+<td>Terminal states</td>
+<td><code>V</code> stays 0; no updates</td>
+</tr>
+<tr>
+<td>Convergence</td>
+<td>Stop when <code>max|V_{k+1} − V_k| &lt; 1e-12</code></td>
+</tr>
+<tr>
+<td>Sweep counting</td>
+<td>One sweep = one full pass over all states. The first pass is sweep 1</td>
+</tr>
+<tr>
+<td>argmax ties</td>
+<td>Break toward the <strong>lowest action index</strong> (up &lt; right &lt; down &lt; left)</td>
+</tr>
+<tr>
+<td>Policy iteration init</td>
+<td>Deterministic policy: action <code>0</code> (up) in every state</td>
+</tr>
+<tr>
+<td>Policy iteration counting</td>
+<td>One round = one evaluation-to-convergence plus one improvement. Count the final round in which the policy does not change</td>
+</tr>
+</tbody>
+</table>
+<p>An in-place sweep or a different tie-break gives different numbers. That is not a rounding difference; it is a different algorithm.</p>
+<p>Two of these are load-bearing here, not hypothetical. In-place evaluation changes the 10-sweep values noticeably. And at least one of the probe states below has two genuinely optimal actions, so the tie-break rule decides the answer you report — both actions are correct policy, but only one matches the reference.</p>
+
+<h2 id="3-what-to-implement">3. What to implement</h2>
+<p><strong>Dynamic programming</strong> (RoomsGridWorld)</p>
+<ul>
+<li>Iterative policy evaluation for the uniform random policy</li>
+<li>Policy iteration</li>
+<li>Value iteration</li>
+</ul>
+<p><strong>TD control</strong> (CliffWalk)</p>
+<ul>
+<li>ε-greedy action selection</li>
+<li>SARSA</li>
+<li>Q-learning</li>
+</ul>
+<p>Use <code>α = 0.5</code>, <code>ε = 0.1</code>, 3000 episodes, and a 400-step cap per episode. Run <strong>at least 5 seeds</strong>. Keep training behaviour and greedy evaluation separate: during training you act ε-greedily; during evaluation you act greedily and do not learn.</p>
+
+<h2 id="4-how-to-submit">4. How to submit</h2>
+<p><strong>One <code>.zip</code> file, uploaded to the LMS. The deadline will be announced separately.</strong></p>
+<p><strong>Start from <code>pa1_starter.zip</code>.</strong> Unzip it, rename the folder <code>PA1_studentID_surname</code> to your own <code>PA1_&lt;studentID&gt;_&lt;surname&gt;</code>, and work inside it. It already has the layout below, a <code>configs/pa1.yaml</code> with the fixed hyperparameters, stub files with the required function signatures, a <code>README.md</code> with the required sections headed, and <code>results.json</code> ready to fill in.</p>
+<p>When you are done, zip that folder. The archive is named <code>PA1_&lt;studentID&gt;_&lt;surname&gt;.zip</code> and contains that single top-level folder:</p>
+<div class="code"><button class="copy" type="button" aria-label="Copy command">Copy</button><pre><code>PA1_20251234_Kim.zip
+└── PA1_20251234_Kim/
+    ├── results.json          &lt;- auto-graded; must sit at this level
+    ├── report.pdf            &lt;- 3-4 pages
+    ├── README.md
+    ├── requirements.txt      &lt;- or environment.yml
+    ├── train.py
+    ├── evaluate.py
+    ├── agent.py
+    ├── configs/
+    ├── figures/
+    └── results/              &lt;- raw per-seed output
+</code></pre></div>
+<p>Do not submit anything else through email or chat. If you upload more than once, the last upload before the deadline is the one marked.</p>
+<p><strong>Late submissions are not accepted.</strong> The LMS closes at the deadline and nothing is marked after it. Upload a working draft early — you can replace it as many times as you like until the deadline, and an incomplete submission scores more than none. Technical trouble on the day is not an extension; if the LMS itself is down, contact the instructor before the deadline, not after.</p>
+<p><strong>Do not include</strong> virtual environments, <code>__pycache__/</code>, <code>.git/</code>, datasets, or model checkpoints. The archive should be a few megabytes at most.</p>
+<h3 id="41-check-the-archive-before-you-upload-it">4.1 Check the archive before you upload it</h3>
+<div class="code"><button class="copy" type="button" aria-label="Copy command">Copy</button><pre><code class="language-bash">python pa1_check_submission.py PA1_20251234_Kim.zip
+</code></pre></div>
+<p>This catches the format problems that otherwise cost marks for no reason: a missing or unparseable <code>results.json</code>, keys left at their template values, files nested one folder too deep. It does not check whether your answers are correct.</p>
+<h3 id="42-resultsjson-the-auto-graded-part">4.2 <code>results.json</code> — the auto-graded part</h3>
+<p>Fill in the <code>results.json</code> from the starter. Report every number to <strong>three decimal places</strong>.</p>
+<div class="code"><button class="copy" type="button" aria-label="Copy command">Copy</button><pre><code class="language-json">{
+  &quot;gridworld&quot;: {
+    &quot;V_random_10_sweeps&quot;:  {&quot;A&quot;: 0.000, &quot;B&quot;: 0.000, &quot;C&quot;: 0.000, &quot;D&quot;: 0.000},
+    &quot;V_random_converged&quot;:  {&quot;A&quot;: 0.000, &quot;B&quot;: 0.000, &quot;C&quot;: 0.000, &quot;D&quot;: 0.000},
+    &quot;V_optimal&quot;:           {&quot;A&quot;: 0.000, &quot;B&quot;: 0.000, &quot;C&quot;: 0.000, &quot;D&quot;: 0.000},
+    &quot;optimal_action&quot;:      {&quot;A&quot;: &quot;up&quot;,  &quot;B&quot;: &quot;up&quot;,  &quot;C&quot;: &quot;up&quot;,  &quot;D&quot;: &quot;up&quot;},
+    &quot;policy_iteration_rounds&quot;: 0,
+    &quot;value_iteration_sweeps&quot;: 0,
+    &quot;optimal_undiscounted_return_from_start&quot;: 0.000
+  },
+  &quot;cliff&quot;: {
+    &quot;V_optimal&quot;:      {&quot;A&quot;: 0.000, &quot;B&quot;: 0.000, &quot;C&quot;: 0.000, &quot;D&quot;: 0.000},
+    &quot;optimal_action&quot;: {&quot;A&quot;: &quot;up&quot;,  &quot;B&quot;: &quot;up&quot;,  &quot;C&quot;: &quot;up&quot;,  &quot;D&quot;: &quot;up&quot;},
+    &quot;value_iteration_sweeps&quot;: 0,
+    &quot;optimal_undiscounted_return_from_start&quot;: 0.000,
+    &quot;optimal_path_length&quot;: 0,
+
+    &quot;sarsa_training_return&quot;:     0.000,
+    &quot;qlearning_training_return&quot;: 0.000,
+    &quot;sarsa_greedy_return&quot;:       0.000,
+    &quot;qlearning_greedy_return&quot;:   0.000,
+    &quot;sarsa_highest_row&quot;:         0.000,
+    &quot;qlearning_highest_row&quot;:     0.000
+  }
+}
+</code></pre></div>
+<p><strong>Probe states</strong></p>
+<table>
+<thead>
+<tr>
+<th>Label</th>
+<th>RoomsGridWorld</th>
+<th>CliffWalk</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>35 — (5, 0), start</td>
+<td>40 — (4, 0), start</td>
+</tr>
+<tr>
+<td>B</td>
+<td>16 — (2, 2)</td>
+<td>30 — (3, 0)</td>
+</tr>
+<tr>
+<td>C</td>
+<td>30 — (4, 2)</td>
+<td>34 — (3, 4)</td>
+</tr>
+<tr>
+<td>D</td>
+<td>13 — (1, 6)</td>
+<td>9 — (0, 9)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Definitions for the TD entries</strong></p>
+<ul>
+<li><code>*_training_return</code> — mean undiscounted episode return over the <strong>last 500 training episodes</strong>, averaged over your seeds</li>
+<li><code>*_greedy_return</code> — undiscounted return of the final greedy policy from the start state, averaged over seeds</li>
+<li><code>*_highest_row</code> — the smallest row index the greedy path visits, averaged over seeds. Row 0 is the top row, row 4 is the cliff row. This number is what separates the two algorithms</li>
+</ul>
+<h3 id="43-code">4.3 Code</h3>
+<p><code>train.py</code>, <code>evaluate.py</code>, <code>agent.py</code>, <code>configs/</code>, <code>README.md</code>, and a dependency file. Your results must be reproducible from the seeds you report.</p>
+<p>Your <code>README.md</code> must state:</p>
+<ul>
+<li>the exact command that reproduces each figure and each number in <code>results.json</code></li>
+<li>every seed you ran, <strong>including the ones that failed</strong> — do not quietly drop them</li>
+<li>your Python, PyTorch, NumPy and Gymnasium versions, and whether you used CPU or GPU</li>
+<li>total wall-clock time</li>
+<li>any use of an AI coding assistant, and for which parts</li>
+</ul>
+<h3 id="44-report-3-to-4-pages">4.4 Report — 3 to 4 pages</h3>
+<p><strong>PDF only.</strong> Answer these four questions with your own figures and numbers.</p>
+<ol>
+<li>Compare the convergence and the final policies of policy iteration and value iteration. Do they reach the same policy? How many sweeps does each need, and why do the counts differ?</li>
+<li>Explain the difference between the paths SARSA and Q-learning learn. Use <code>*_highest_row</code> to make the claim concrete.</li>
+<li>Analyse the effect of ε on exploration, training return and final greedy evaluation. Run at least three values of ε.</li>
+<li><strong>Q-learning gets a worse training return than SARSA, but a better greedy evaluation.</strong> Explain why both facts are true at once, and what that says about what each algorithm is estimating.</li>
+</ol>
+<h3 id="45-required-figures">4.5 Required figures</h3>
+<ul>
+<li>State-value heatmap and greedy-policy arrows for RoomsGridWorld</li>
+<li>Training-return curves for SARSA and Q-learning, mean and standard deviation over seeds</li>
+<li>The greedy path of each algorithm drawn on the CliffWalk grid</li>
+</ul>
+<h3 id="46-before-you-upload">4.6 Before you upload</h3>
+<ul>
+<li>[ ] <code>results.json</code> is at the top level of the folder and parses as valid JSON</li>
+<li>[ ] Every value is filled in — no zeros left over from the template</li>
+<li>[ ] <code>python train.py</code> runs from a clean checkout of your own archive</li>
+<li>[ ] The report is a PDF and is 3-4 pages</li>
+<li>[ ] <code>README.md</code> lists every seed, the reproduction commands, and any AI assistant use</li>
+<li>[ ] No <code>__pycache__/</code>, <code>.git/</code>, or virtual environment inside the archive</li>
+<li>[ ] <code>pa1_check_submission.py</code> reports no errors</li>
+</ul>
+
+<h2 id="5-marking">5. Marking</h2>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Weight</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dynamic-programming implementation</td>
+<td>30%</td>
+</tr>
+<tr>
+<td>SARSA and Q-learning implementation</td>
+<td>30%</td>
+</tr>
+<tr>
+<td>Experiments and visualisation</td>
+<td>20%</td>
+</tr>
+<tr>
+<td>Interpretation of results</td>
+<td>15%</td>
+</tr>
+<tr>
+<td>Code quality and reproducibility</td>
+<td>5%</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>results.json</code> numbers are checked automatically against a reference implementation and feed the two implementation rows. A wrong number usually means a convention in Section 2 was not followed — check those first.</p>
+
+<h2 id="6-notes">6. Notes</h2>
+<p><strong>Sanity checks you can run yourself.</strong> Policy iteration and value iteration must arrive at the same optimal policy. Your <code>V_optimal</code> for CliffWalk should decrease smoothly with distance from the goal. If the greedy policy from your Q ever fails to reach the goal, you have a bug — the discount factor was chosen so this cannot happen at convergence.</p>
+<p><strong>AI coding assistants are permitted</strong>, under the conditions in the setup guide: disclose their use in your <code>README</code>, take responsibility for correctness, and be prepared to explain any line. Note that these environments are not the textbook ones — an implementation recalled from memory rather than derived from <code>env.P</code> will produce confidently wrong numbers.</p>
+<p><strong>If something looks broken in <code>pa1_envs.py</code>, report it</strong> rather than editing it. Corrections will be distributed to everyone.</p></main>
+</div>
+
+<footer><div class="wrap">Distributed by the instructor.</div></footer>
+
+<script>
+document.querySelectorAll('.copy').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var text = btn.parentElement.querySelector('pre').innerText;
+    navigator.clipboard.writeText(text).then(function(){
+      btn.textContent = 'Copied'; btn.classList.add('done');
+      setTimeout(function(){ btn.textContent = 'Copy'; btn.classList.remove('done'); }, 1400);
+    });
+  });
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+# PA1 epsilon sweep (report question 3), epsilon = 0.05.
+# Identical to configs/pa1.yaml except td_control.epsilon and the two output
+# paths, which point to results_sweep/ so the main results are not overwritten.
+
+seeds: [0, 1, 2, 3, 4]        # at least five; report every one you ran
+
+dynamic_programming:
+  theta: 1.0e-12              # convergence threshold, max|V_{k+1} - V_k|
+  policy_eval_sweeps: 10      # for the V_random_10_sweeps item
+  # gamma comes from the environment (RoomsGridWorld: 0.95)
+
+td_control:
+  alpha: 0.5
+  epsilon: 0.05
+  episodes: 3000
+  max_steps_per_episode: 400
+  training_return_window: 500 # mean over the LAST 500 episodes
+  # gamma comes from the environment (CliffWalk: 0.99)
+
+output:
+  results_json: results_sweep/eps_0.05/results.json
+  figures_dir: figures
+  raw_dir: results_sweep/eps_0.05              # per-seed raw output goes here
